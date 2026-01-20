@@ -1,0 +1,22 @@
+site_name: mkdocs-doubleslash-theme
+repo_url: https://doubleslashde.github.io/mkdocs-doubleslash-theme
+repo_name: mkdocs-doubleslash-theme
+edit_uri: edit/main/docs/
+
+theme:
+  name: material
+  features:
+    - content.action.edit
+    - navigation.top
+
+plugins:
+  - search
+  - doubleslash-theme
+
+markdown_extensions:
+  - pymdownx.highlight:
+      anchor_linenums: true
+  - pymdownx.superfences
+
+nav:
+  - Home: index.md

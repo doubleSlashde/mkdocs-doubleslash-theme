@@ -1,0 +1,9 @@
+#!/bin/bash
+set -eou pipefail
+
+IMAGE_NAME="mkdocs-doubleslash-theme"
+docker build -t $IMAGE_NAME .
+docker run --rm \
+  -p 8000:8000 \
+  -v "$(pwd):/docs" \
+  "$IMAGE_NAME"

@@ -1,0 +1,47 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mkdocs-doubleslash-theme"
+description = "doubleSlash Theme for MkDocs"
+version = "1.0.0-rc0"
+authors = [
+    { name = "Jonas Häusler", email = "jonas.haeusler@doubleslash.de" },
+    { name = "Elisabeth Lutat", email = "elisabeth.lutat@doubleslash.de" }
+]
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "mkdocs>=1.6",
+    "mkdocs-material>=9.7"
+]
+
+[tool.setuptools]
+packages = ["mkdocs_doubleslash_theme"]
+include-package-data = true
+
+[tool.setuptools.package-data]
+mkdocs_doubleslash_theme = ["assets/**/*", "overrides/**/*"]
+
+[project.entry-points."mkdocs.plugins"]
+doubleslash-theme = "mkdocs_doubleslash_theme.plugin:DoubleSlashThemePlugin"
+
+[tool.commitizen]
+name = "cz_customize"
+tag_format = "v$version"
+version_provider = "uv"
+version_files = [
+    "pyproject.toml:version"
+]
+
+[tool.commitizen.customize]
+bump_pattern = '^(feat|fix|ci|build|perf|refactor|chore)'
+bump_map = { feat = "MINOR", fix = "PATCH", ci = "PATCH", build = "PATCH", perf = "PATCH", refactor = "PATCH", 'chore' = "PATCH" }
+schema_pattern = '^(build|ci|docs|feat|fix|perf|refactor|style|test|chore|revert|bump|chore)(\(\S+\))?\:?\s.*'
+
+[dependency-groups]
+dev = [
+    "commitizen>=3.31.0",
+    "ruff>=0.14.11",
+]

@@ -1,0 +1,5 @@
+*
+!mkdocs_doubleslash_theme/
+!pyproject.toml
+!README.md
+!Dockerfile
