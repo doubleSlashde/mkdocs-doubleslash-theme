@@ -22,7 +22,7 @@ packages = ["mkdocs_doubleslash_theme"]
 include-package-data = true
 
 [tool.setuptools.package-data]
-mkdocs_doubleslash_theme = ["assets/**/*", "overrides/**/*"]
+mkdocs_doubleslash_theme = ["assets/**/*", "overrides/**/*", "overrides/.icons/*"]
 
 [project.entry-points."mkdocs.plugins"]
 doubleslash-theme = "mkdocs_doubleslash_theme.plugin:DoubleSlashThemePlugin"
