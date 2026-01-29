@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "mkdocs-doubleslash-theme"
 description = "doubleSlash Theme for MkDocs"
-version = "1.0.0"
+version = "1.1.0"
 authors = [
     { name = "Jonas Häusler", email = "jonas.haeusler@doubleslash.de" },
     { name = "Elisabeth Lutat", email = "elisabeth.lutat@doubleslash.de" }
