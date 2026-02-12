@@ -70,12 +70,6 @@
 :root {
     --md-text-font: Inter;
 
-    *,
-    ::after,
-    ::before {
-        box-sizing: content-box;
-    }
-
     .md-header--shadow {
         box-shadow: 0 0 6px #00000029;
     }
