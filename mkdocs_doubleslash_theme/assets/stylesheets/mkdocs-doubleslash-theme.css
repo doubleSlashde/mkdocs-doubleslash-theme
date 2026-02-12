@@ -195,4 +195,8 @@
     td:last-child {
         border-right: none;
     }
+
+    .md-path__item:not(:first-child) {
+        align-items: center;
+    }
 }
