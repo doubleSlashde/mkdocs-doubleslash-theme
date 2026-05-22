@@ -207,3 +207,7 @@
     height: 1rem;
     width: 1rem;
 }
+
+.md-grid {
+    max-width: 1800px;
+}
