@@ -29,18 +29,32 @@ class DoubleSlashThemePlugin(BasePlugin):
         # Only set palette if user hasn't defined their own
         if not theme.get("palette"):
             theme["palette"] = [
-                {"media": "(prefers-color-scheme)"},
+                {
+                    "media": "(prefers-color-scheme)",
+                    "toggle": {
+                        "icon": "lucide/sun-moon",
+                        "name": "Switch to light mode",
+                    },
+                },
                 {
                     "media": "(prefers-color-scheme: light)",
                     "primary": "custom",
                     "accent": "custom",
                     "scheme": "default",
+                    "toggle": {
+                        "icon": "lucide/sun",
+                        "name": "Switch to dark mode",
+                    },
                 },
                 {
                     "media": "(prefers-color-scheme: dark)",
                     "primary": "custom",
                     "accent": "custom",
                     "scheme": "slate",
+                    "toggle": {
+                        "icon": "lucide/moon-star",
+                        "name": "Switch to system preference",
+                    },
                 },
             ]
 

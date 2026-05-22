@@ -200,3 +200,10 @@
         align-items: center;
     }
 }
+
+.md-icon svg.lucide {
+    fill: none;
+    stroke: currentcolor;
+    height: 1rem;
+    width: 1rem;
+}
