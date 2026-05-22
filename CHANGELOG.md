@@ -1,4 +1,4 @@
-## Unreleased
+## v1.2.0 (2026-05-22)
 
 ### Features
 
@@ -7,6 +7,7 @@
 
 ### Build
 
+- fix changelog formatting in commitizen config
 - **deps-dev**: bump ruff from 0.15.12 to 0.15.13
 - **deps**: bump the uv group across 1 directory with 2 updates
 - **deps-dev**: bump commitizen from 4.15.0 to 4.16.0
