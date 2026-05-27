@@ -1,3 +1,15 @@
+## v1.2.1 (2026-05-27)
+
+### Bug Fixes
+
+- keep md-grid within viewport on screens below 1800px
+
+### Build
+
+- **deps**: bump the uv group across 1 directory with 4 updates
+- **deps-dev**: bump ruff from 0.15.0 to 0.15.14
+- **deps**: bump mkdocs-material from 9.7.1 to 9.7.6
+
 ## v1.2.0 (2026-05-22)
 
 ### Features
