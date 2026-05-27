@@ -209,5 +209,5 @@
 }
 
 .md-grid {
-    max-width: 1800px;
+    max-width: min(1800px, 100% - 4rem);
 }
