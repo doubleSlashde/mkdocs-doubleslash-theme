@@ -4,6 +4,7 @@
 
 - add content width toggle to collapse sidebars and widen the content area on desktop
 - add table of contents collapse toggle with initial tooltip in the top right corner
+- refactor styles to align better with styleguide
 
 ## v1.2.1 (2026-05-27)
 
