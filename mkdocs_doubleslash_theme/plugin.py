@@ -1,11 +1,16 @@
 import os
 
+from mkdocs.config import config_options
 from mkdocs.plugins import BasePlugin
 from mkdocs.structure.files import File
 
 
 class DoubleSlashThemePlugin(BasePlugin):
     """MkDocs plugin that applies doubleSlash corporate styling to Material theme."""
+
+    config_scheme = (
+        ("content_width_toggle", config_options.Type(bool, default=True)),
+    )
 
     def __init__(self):
         super().__init__()
@@ -16,6 +21,16 @@ class DoubleSlashThemePlugin(BasePlugin):
     def on_config(self, config):
         theme = config["theme"]
         config["extra_css"].append("stylesheets/mkdocs-doubleslash-theme.css")
+
+        content_width_toggle = self.config.get("content_width_toggle", True)
+        config.setdefault("extra", {})["ds_content_width_toggle"] = content_width_toggle
+        if content_width_toggle:
+            config["extra_javascript"].append(
+                "javascripts/content-width-toggle.js"
+            )
+            config["extra_javascript"].append(
+                "javascripts/toc-collapse-toggle.js"
+            )
 
         # Insert overrides after user's custom_dir (if any) so user overrides take precedence
         if self.overrides_dir not in theme.dirs:

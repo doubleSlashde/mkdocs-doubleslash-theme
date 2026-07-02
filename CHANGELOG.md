@@ -1,3 +1,10 @@
+## v1.x.x (unreleased)
+
+### Features
+
+- add content width toggle to collapse sidebars and widen the content area on desktop
+- add table of contents collapse toggle with initial tooltip in the top right corner
+
 ## v1.2.1 (2026-05-27)
 
 ### Bug Fixes

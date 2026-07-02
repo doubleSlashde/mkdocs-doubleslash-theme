@@ -30,6 +30,18 @@
 {% endif %}
 
 <!-- Header -->
+{% if config.extra.ds_content_width_toggle | default(true) %}
+<script>
+  try {
+    if (localStorage.getItem("ds-content-wide") === "true") {
+      document.documentElement.setAttribute("data-ds-content-wide", "");
+    }
+    if (localStorage.getItem("ds-toc-collapsed") === "true") {
+      document.documentElement.setAttribute("data-ds-toc-collapsed", "");
+    }
+  } catch (e) {}
+</script>
+{% endif %}
 <header class="{{ class }}" data-md-component="header">
   <nav
       class="md-header__inner md-grid"
@@ -121,3 +133,7 @@
   {% endif %}
   {% endif %}
 </header>
+{% if config.extra.ds_content_width_toggle | default(true) %}
+  {% include "partials/content-width-toggle.html" %}
+  {% include "partials/toc-collapse-toggle.html" %}
+{% endif %}
