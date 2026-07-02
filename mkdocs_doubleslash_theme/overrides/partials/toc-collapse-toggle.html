@@ -1,0 +1,26 @@
+<div class="ds-toc-toggle-wrapper">
+  <div
+      class="ds-toc-toggle__tooltip"
+      data-md-component="toc-collapse-tooltip"
+      role="tooltip"
+      hidden
+  >
+    Hier können Sie das Inhaltsverzeichnis ausblenden
+  </div>
+  <button
+      type="button"
+      class="ds-toc-toggle md-icon"
+      data-md-component="toc-collapse-toggle"
+      aria-pressed="false"
+      aria-label="Inhaltsverzeichnis ausblenden"
+      title="Inhaltsverzeichnis ausblenden"
+      hidden
+  >
+    <span class="ds-toc-toggle__icon ds-toc-toggle__icon--collapse">
+      {% include ".icons/lucide/chevrons-right.svg" %}
+    </span>
+    <span class="ds-toc-toggle__icon ds-toc-toggle__icon--expand" hidden>
+      {% include ".icons/lucide/chevrons-left.svg" %}
+    </span>
+  </button>
+</div>

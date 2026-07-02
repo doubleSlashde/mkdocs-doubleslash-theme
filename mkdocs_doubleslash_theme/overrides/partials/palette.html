@@ -1,0 +1,56 @@
+<!--
+  Color palette toggle — switch-icon-3 (dark / system / light)
+  Source: docs/components-html-css/Molecules/switch.md (Icon-3)
+-->
+
+<form
+    class="md-header__option ds-switch-wrapper"
+    data-md-component="palette"
+    role="group"
+    aria-label="{{ lang.t('palette') | d('Color scheme', true) }}"
+>
+  <div class="form form-icon primary">
+    <div class="switch-field user-select-none">
+      <span class="switch" aria-hidden="true">
+        {% for option in config.theme.palette %}
+          {% if option.toggle %}
+          <span class="switch__icon switch__icon--{{ loop.index0 }}">
+            {% include ".icons/" ~ option.toggle.icon ~ ".svg" %}
+          </span>
+          {% endif %}
+        {% endfor %}
+      </span>
+
+      {% for option in config.theme.palette %}
+        {% set scheme = option.scheme | d("default", true) %}
+        {% set primary = option.primary | d("indigo", true) %}
+        {% set accent = option.accent | d("indigo", true) %}
+        <input
+            class="md-option"
+            type="radio"
+            name="__palette"
+            id="__palette_{{ loop.index0 }}"
+            data-md-color-media="{{ option.media | d('', true) }}"
+            data-md-color-scheme="{{ scheme | replace(' ', '-') }}"
+            data-md-color-primary="{{ primary | replace(' ', '-') }}"
+            data-md-color-accent="{{ accent | replace(' ', '-') }}"
+            {% if option.toggle %}
+            aria-label="{{ option.toggle.name }}"
+            {% else %}
+            aria-hidden="true"
+            {% endif %}
+        />
+        {% if option.toggle %}
+        <label
+            class="option md-icon"
+            for="__palette_{{ loop.index0 }}"
+            title="{{ option.toggle.name }}"
+            aria-label="{{ option.toggle.name }}"
+        >
+          {% include ".icons/" ~ option.toggle.icon ~ ".svg" %}
+        </label>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+</form>
