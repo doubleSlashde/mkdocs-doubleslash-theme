@@ -429,7 +429,7 @@
     padding: 0;
     background-color: var(--ds-color-on-primary);
     color: var(--ds-color-primary);
-    border-radius: 2rem;
+    border-radius: var(--ds-rounded-pill);
     position: absolute;
     z-index: 2;
     border: 0;
