@@ -411,7 +411,7 @@
     display: flex;
     overflow: hidden;
     position: relative;
-    border-radius: 1rem;
+    border-radius: var(--ds-rounded-lg);
     align-items: center;
     user-select: none;
 }
@@ -459,7 +459,7 @@
     padding: 0;
     background-color: var(--ds-color-on-primary);
     color: var(--ds-color-primary);
-    border-radius: 2rem;
+    border-radius: var(--ds-rounded-pill);
     position: absolute;
     z-index: 2;
     border: 0;
@@ -606,7 +606,7 @@
     }
 
     .ds-toc-toggle:hover {
-        color: white;
+        color: var(--ds-color-on-primary);
         background-color: var(--ds-color-primary);
     }
 
@@ -756,7 +756,7 @@
     }
 
     .ds-content-width-toggle:hover {
-        color: white;
+        color: var(--ds-color-on-primary);
         background-color: var(--ds-color-primary);
     }
 
