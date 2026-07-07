@@ -26,9 +26,24 @@
     }
   }
 
-  function tocSidebarIsHidden() {
+  function tocIsUnavailable() {
     var secondary = document.querySelector(".md-sidebar--secondary");
-    return !secondary || secondary.hasAttribute("hidden");
+    if (!secondary || secondary.hasAttribute("hidden")) {
+      return true;
+    }
+    // Material hides the secondary sidebar on small screens (display: none),
+    // where the ToC is folded into the navigation drawer instead. offsetParent
+    // is null when the element (or an ancestor) is display:none, so this covers
+    // the responsive case without hardcoding a breakpoint. A collapsed sidebar
+    // uses visibility:hidden (not display:none), so it still keeps a layout box
+    // and the button stays available to expand it again.
+    if (secondary.offsetParent === null) {
+      return true;
+    }
+    // Material renders the secondary sidebar even for pages without headings,
+    // leaving an empty ToC. Treat an empty ToC as hidden so the toggle button
+    // is only shown when there is an actual table of contents to collapse.
+    return !secondary.querySelector(".md-nav--secondary .md-nav__item");
   }
 
   function updateButtonState(button) {
@@ -48,24 +63,85 @@
     }
   }
 
-  function hideTooltip(tooltip) {
-    if (!tooltip || tooltip.hidden) {
+  function shouldKeepTooltipVisible(button, isHovered) {
+    return document.activeElement === button || isHovered;
+  }
+
+  function showTooltip(tooltip) {
+    if (!tooltip) {
+      return;
+    }
+    tooltip.classList.add("ds-toc-toggle__tooltip--visible");
+  }
+
+  function hideTooltip(tooltip, button, isHovered, force) {
+    if (!tooltip || !tooltip.classList.contains("ds-toc-toggle__tooltip--visible")) {
+      return;
+    }
+    if (!force && button && shouldKeepTooltipVisible(button, isHovered)) {
       return;
     }
     tooltip.classList.remove("ds-toc-toggle__tooltip--visible");
-    window.setTimeout(function () {
-      tooltip.hidden = true;
-    }, 200);
   }
 
-  function updateButtonVisibility(button, tooltip, desktopMedia) {
+  function bindTooltipInteractions(button, tooltip) {
+    var isHovered = false;
+    var autoHideTimer = null;
+
+    function clearAutoHideTimer() {
+      if (autoHideTimer !== null) {
+        window.clearTimeout(autoHideTimer);
+        autoHideTimer = null;
+      }
+    }
+
+    function hideIfUnpinned(force) {
+      hideTooltip(tooltip, button, isHovered, force);
+    }
+
+    function scheduleAutoHide() {
+      clearAutoHideTimer();
+      autoHideTimer = window.setTimeout(function () {
+        hideIfUnpinned(false);
+      }, TOOLTIP_DURATION_MS);
+    }
+
+    button.addEventListener("focus", function () {
+      clearAutoHideTimer();
+      showTooltip(tooltip);
+    });
+
+    button.addEventListener("blur", function () {
+      hideIfUnpinned(false);
+    });
+
+    button.addEventListener("mouseenter", function () {
+      isHovered = true;
+      clearAutoHideTimer();
+      showTooltip(tooltip);
+    });
+
+    button.addEventListener("mouseleave", function () {
+      isHovered = false;
+      hideIfUnpinned(false);
+    });
+
+    return {
+      scheduleAutoHide: scheduleAutoHide,
+      clearAutoHideTimer: clearAutoHideTimer,
+      hideIfUnpinned: hideIfUnpinned,
+    };
+  }
+
+  function updateButtonVisibility(button, tooltip, tooltipControl) {
     var wasVisible = !button.hidden;
-    var shouldShow = desktopMedia.matches && !tocSidebarIsHidden();
+    var shouldShow = !tocIsUnavailable();
     button.hidden = !shouldShow;
 
     if (!shouldShow) {
       if (wasVisible) {
-        hideTooltip(tooltip);
+        tooltipControl.clearAutoHideTimer();
+        tooltipControl.hideIfUnpinned(true);
       }
       if (isTocCollapsed()) {
         setTocCollapsed(false);
@@ -74,10 +150,10 @@
       return;
     }
 
-    maybeShowInitialTooltip(button, tooltip);
+    maybeShowInitialTooltip(button, tooltip, tooltipControl);
   }
 
-  function maybeShowInitialTooltip(button, tooltip) {
+  function maybeShowInitialTooltip(button, tooltip, tooltipControl) {
     if (!tooltip || button.hidden) {
       return;
     }
@@ -90,10 +166,10 @@
       return;
     }
 
-    showInitialTooltip(tooltip, button);
+    showInitialTooltip(tooltip, tooltipControl);
   }
 
-  function showInitialTooltip(tooltip, button) {
+  function showInitialTooltip(tooltip, tooltipControl) {
     if (!tooltip || tooltip.classList.contains("ds-toc-toggle__tooltip--visible")) {
       return;
     }
@@ -102,22 +178,10 @@
       sessionStorage.setItem(TOOLTIP_STORAGE_KEY, "true");
     } catch (e) {}
 
-    tooltip.hidden = false;
     window.requestAnimationFrame(function () {
-      tooltip.classList.add("ds-toc-toggle__tooltip--visible");
+      showTooltip(tooltip);
+      tooltipControl.scheduleAutoHide();
     });
-
-    window.setTimeout(function () {
-      hideTooltip(tooltip);
-    }, TOOLTIP_DURATION_MS);
-
-    button.addEventListener(
-      "click",
-      function () {
-        hideTooltip(tooltip);
-      },
-      { once: true }
-    );
   }
 
   function init() {
@@ -127,6 +191,7 @@
       return;
     }
 
+    var tooltipControl = bindTooltipInteractions(button, tooltip);
     var desktopMedia = window.matchMedia(DESKTOP_QUERY);
 
     try {
@@ -136,7 +201,7 @@
     } catch (e) {}
 
     updateButtonState(button);
-    updateButtonVisibility(button, tooltip, desktopMedia);
+    updateButtonVisibility(button, tooltip, tooltipControl);
 
     button.addEventListener("click", function () {
       setTocCollapsed(!isTocCollapsed());
@@ -145,12 +210,12 @@
     });
 
     desktopMedia.addEventListener("change", function () {
-      updateButtonVisibility(button, tooltip, desktopMedia);
+      updateButtonVisibility(button, tooltip, tooltipControl);
       updateButtonState(button);
     });
 
     window.addEventListener("resize", function () {
-      updateButtonVisibility(button, tooltip, desktopMedia);
+      updateButtonVisibility(button, tooltip, tooltipControl);
     });
   }
 
