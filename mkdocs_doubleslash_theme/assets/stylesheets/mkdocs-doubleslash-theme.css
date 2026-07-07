@@ -381,7 +381,7 @@
     display: flex;
     overflow: hidden;
     position: relative;
-    border-radius: 1rem;
+    border-radius: var(--ds-rounded-lg);
     align-items: center;
     user-select: none;
 }
