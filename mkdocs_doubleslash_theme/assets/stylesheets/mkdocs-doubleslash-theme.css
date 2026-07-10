@@ -411,7 +411,7 @@
     display: flex;
     overflow: hidden;
     position: relative;
-    border-radius: var(--ds-rounded-lg);
+    border-radius: var(--ds-rounded-pill);
     align-items: center;
     user-select: none;
 }
@@ -583,6 +583,7 @@
         position: fixed;
         top: 6rem;
         right: var(--ds-spacing-xl);
+        z-index: 6;
     }
 
     .ds-toc-toggle {
