@@ -1,9 +1,3 @@
----
-hide:
-  - navigation
-  - toc
----
-
 # mkdocs-doubleslash-theme
 
 [doubleSlash theme](https://doubleslash.style/) for MkDocs.
