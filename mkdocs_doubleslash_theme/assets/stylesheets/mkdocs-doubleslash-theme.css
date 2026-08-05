@@ -244,6 +244,7 @@
        sidebar divider instead of floating centered in the available space. */
     .md-content__inner {
         max-width: 90ch;
+        transition: max-width var(--ds-motion-duration) ease;
     }
 
     .md-content .md-typeset h1,
@@ -425,10 +426,19 @@
     /* Once a sidebar is actually collapsed, drop the 90ch reading cap so text
        fills the reclaimed space instead of leaving it padded out on one
        side — that's the whole point of the widen toggle. Material's own
-       small per-sidebar gutter (margin-left/right: 1.2rem) still applies. */
+       small per-sidebar gutter (margin-left/right: 1.2rem) still applies.
+       Reuses the same cap as .md-grid (a concrete value, not `none`) so the
+       max-width transition can interpolate smoothly instead of jumping. */
     html[data-ds-content-wide] .md-content__inner,
     html[data-ds-toc-collapsed] .md-content__inner {
-        max-width: none;
+        max-width: var(--ds-wide-max-width);
+    }
+
+    /* The ToC sidebar already bounds the layout on the right, so text can
+       fill toward it without feeling unbounded — only cap the reading
+       measure when there's no ToC there to fill toward. */
+    [dir="ltr"] .md-sidebar--secondary:not([hidden]) ~ .md-content > .md-content__inner {
+        max-width: var(--ds-wide-max-width);
     }
 }
 
@@ -487,7 +497,7 @@
         height: var(--ds-spacing-control-height);
         padding: 0;
         margin: 5px 0 0 0;
-        border: inset 0 0 0 2px var(--ds-color-primary);
+        border: 2px solid var(--ds-color-border);
         border-radius: 50px;
         background-color: var(--md-default-bg-color);
         color: var(--md-default-fg-color);
@@ -495,8 +505,12 @@
         transition: var(--ds-motion-transition);
     }
 
-    [data-md-color-scheme="slate"] .ds-toc-toggle {
-        border-color: var(--ds-color-dark-clickable);
+    /* var(--md-accent-fg-color): already scheme-aware (aliases to the light
+       or dark accent per [data-md-color-scheme]), unlike a separate slate
+       override here — Material puts that attribute on <body>, not <html>,
+       so a selector combining it with html[data-ds-toc-collapsed] never matches. */
+    html[data-ds-toc-collapsed] .ds-toc-toggle {
+        border: 2px solid var(--md-accent-fg-color);
     }
 
     .ds-toc-toggle:hover {
@@ -590,10 +604,6 @@
 }
 
 @media screen and (min-width: 76.25em) {
-    .md-content {
-        padding-left: 40px;
-    }
-
     .md-sidebar--primary,
     .md-sidebar--secondary {
         transition:
@@ -601,6 +611,23 @@
             min-width var(--ds-motion-duration) ease,
             opacity var(--ds-motion-duration) ease,
             visibility 0s linear 0s;
+    }
+
+    /* Fixed width so the nav text doesn't reflow as the sidebar's own width
+       animates to/from 0 — the outer sidebar just clips it via overflow,
+       instead of the text re-wrapping line by line during the transition.
+       .md-sidebar__scrollwrap has its own 0.2rem margin on each side, so
+       matching the sidebar's own 12.1rem here overflowed it horizontally. */
+    .md-sidebar__inner {
+        width: calc(12.1rem - 0.4rem);
+    }
+
+    /* Material only sets overflow-y on the scrollwrap, which per spec forces
+       overflow-x to auto too — while the sidebar's width is mid-transition,
+       the fixed-width inner above briefly overflows it, flashing a
+       horizontal scrollbar. We never want horizontal scroll here anyway. */
+    .md-sidebar__scrollwrap {
+        overflow-x: hidden;
     }
 
     .md-main__inner {
@@ -630,7 +657,6 @@
         position: fixed;
         top: 50%;
         margin-top: calc(var(--ds-toggle-size) / -2);
-        margin-left: calc(var(--ds-toggle-size) / -2);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -685,15 +711,14 @@
         display: none;
     }
 
+    /* var(--md-accent-fg-color): already scheme-aware (aliases to the light
+       or dark accent per [data-md-color-scheme]), unlike a separate slate
+       override here — Material puts that attribute on <body>, not <html>,
+       so a selector combining it with html[data-ds-content-wide] never matches. */
     html[data-ds-content-wide] .ds-content-width-toggle {
-        left: var(--ds-spacing-xl);
         margin-left: 0;
-        border: inset 0 0 0 2px var(--ds-color-primary);
+        border: 2px solid var(--md-accent-fg-color);
         border-radius: 50px;
-    }
-
-    [data-md-color-scheme="slate"] html[data-ds-content-wide] .ds-content-width-toggle {
-        border-color: var(--ds-color-dark-clickable);
     }
 
     @media (prefers-reduced-motion: reduce) {

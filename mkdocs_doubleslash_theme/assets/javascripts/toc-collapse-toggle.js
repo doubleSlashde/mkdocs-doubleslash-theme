@@ -139,6 +139,40 @@
       };
     }
   
+    function updateWrapperPosition(wrapper) {
+      if (!wrapper) {
+        return;
+      }
+
+      // Sit just outside the relevant right boundary — the secondary
+      // sidebar while it's still showing (touching the ToC's own right
+      // edge, not the divider — sitting on the divider used to overlap
+      // both the "edit this page" icon in content and the ToC's own nav
+      // links on short pages), or .md-main__inner (aligned with the header
+      // grid) once it's collapsed. Never inside either box.
+      var collapsed = isTocCollapsed();
+      var anchor = document.querySelector(collapsed ? ".md-main__inner" : ".md-sidebar--secondary");
+      if (!anchor) {
+        wrapper.style.removeProperty("right");
+        return;
+      }
+
+      var width = wrapper.getBoundingClientRect().width;
+      // Extra 20px breathing room from the grid edge, but only when parked
+      // there in the collapsed state — flush against the ToC divider
+      // otherwise. Never closer than 20px to the real viewport edge either,
+      // or the wrapper ends up pinned to it on viewports with little margin.
+      var gap = collapsed ? 20 : 0;
+      var right = Math.max(20, window.innerWidth - anchor.getBoundingClientRect().right - width - gap);
+      wrapper.style.right = right + "px";
+    }
+
+    function scheduleWrapperPositionUpdate(wrapper) {
+      window.requestAnimationFrame(function () {
+        updateWrapperPosition(wrapper);
+      });
+    }
+
     function updateButtonVisibility(button, tooltip, tooltipControl) {
       var wasVisible = !button.hidden;
       var shouldShow = !tocIsUnavailable();
@@ -193,38 +227,61 @@
     function init() {
       var button = document.querySelector("[data-md-component='toc-collapse-toggle']");
       var tooltip = document.querySelector("[data-md-component='toc-collapse-tooltip']");
+      var wrapper = document.querySelector(".ds-toc-toggle-wrapper");
       if (!button) {
         return;
       }
-  
+
       var tooltipControl = bindTooltipInteractions(button, tooltip);
       var desktopMedia = window.matchMedia(DESKTOP_QUERY);
-  
+
       try {
         if (localStorage.getItem(STORAGE_KEY) === "true") {
           setTocCollapsed(true);
         }
       } catch (e) {}
-  
+
       updateButtonState(button, tooltip);
       updateButtonVisibility(button, tooltip, tooltipControl);
+      updateWrapperPosition(wrapper);
 
       button.addEventListener("click", function () {
         setTocCollapsed(!isTocCollapsed());
         updateButtonState(button, tooltip);
+        updateWrapperPosition(wrapper);
         tooltipControl.clearAutoHideTimer();
         tooltipControl.hideIfUnpinned(true);
+        // A mouse click also focuses the button, and the focus handler
+        // below shows the tooltip again with no auto-hide — blur so the
+        // click's force-hide actually sticks.
+        button.blur();
         document.dispatchEvent(new CustomEvent("ds-toc-collapse-change"));
       });
-  
+
       desktopMedia.addEventListener("change", function () {
         updateButtonVisibility(button, tooltip, tooltipControl);
         updateButtonState(button, tooltip);
+        updateWrapperPosition(wrapper);
       });
-  
+
       window.addEventListener("resize", function () {
         updateButtonVisibility(button, tooltip, tooltipControl);
+        updateWrapperPosition(wrapper);
       });
+
+      document.addEventListener("ds-content-wide-change", function () {
+        scheduleWrapperPositionUpdate(wrapper);
+      });
+
+      if (typeof ResizeObserver !== "undefined") {
+        var resizeObserver = new ResizeObserver(function () {
+          scheduleWrapperPositionUpdate(wrapper);
+        });
+        var content = document.querySelector(".md-content");
+        if (content) {
+          resizeObserver.observe(content);
+        }
+      }
     }
   
     if (document.readyState === "loading") {
