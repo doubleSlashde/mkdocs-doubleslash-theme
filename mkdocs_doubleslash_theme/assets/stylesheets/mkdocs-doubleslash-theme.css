@@ -223,6 +223,14 @@
         transition: border-color var(--ds-motion-duration) ease;
     }
 
+    /* Fixed reading measure: as the sidebars collapse/expand, .md-content__inner
+       is a flex item that keeps resizing, so the prose keeps re-wrapping for the
+       whole animation. Capping it stops the reflow and is a readability win on
+       wide screens either way — .md-grid stays wide for tables/diagrams. */
+    .md-content__inner {
+        max-width: 80ch;
+    }
+
     .md-content .md-typeset h1,
     .md-content .md-typeset h2,
     .md-content .md-typeset h3,
