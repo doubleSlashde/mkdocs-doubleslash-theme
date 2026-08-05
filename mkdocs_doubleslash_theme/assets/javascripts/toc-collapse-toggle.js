@@ -206,6 +206,8 @@
       button.addEventListener("click", function () {
         setTocCollapsed(!isTocCollapsed());
         updateButtonState(button);
+        tooltipControl.clearAutoHideTimer();
+        tooltipControl.hideIfUnpinned(true);
         document.dispatchEvent(new CustomEvent("ds-toc-collapse-change"));
       });
   
