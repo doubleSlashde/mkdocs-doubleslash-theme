@@ -39,20 +39,10 @@ class DoubleSlashThemePlugin(BasePlugin):
         if not theme.get("palette"):
             theme["palette"] = [
                 {
-                    "media": "(prefers-color-scheme: dark)",
-                    "primary": "custom",
-                    "accent": "custom",
-                    "scheme": "slate",
-                    "toggle": {
-                        "icon": "lucide/moon-star",
-                        "name": "Dark mode",
-                    },
-                },
-                {
                     "media": "(prefers-color-scheme)",
                     "toggle": {
-                        "icon": "circle-half",
-                        "name": "System color scheme",
+                        "icon": "lucide/sun-moon",
+                        "name": "Switch to light mode",
                     },
                 },
                 {
@@ -62,7 +52,17 @@ class DoubleSlashThemePlugin(BasePlugin):
                     "scheme": "default",
                     "toggle": {
                         "icon": "lucide/sun",
-                        "name": "Light mode",
+                        "name": "Switch to dark mode",
+                    },
+                },
+                {
+                    "media": "(prefers-color-scheme: dark)",
+                    "primary": "custom",
+                    "accent": "custom",
+                    "scheme": "slate",
+                    "toggle": {
+                        "icon": "lucide/moon-star",
+                        "name": "Switch to system preference",
                     },
                 },
             ]
