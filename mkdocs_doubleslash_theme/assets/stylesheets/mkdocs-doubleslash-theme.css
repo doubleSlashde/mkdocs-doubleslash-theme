@@ -554,9 +554,20 @@
     max-width: min(1800px, 100% - 4rem);
 }
 
+/* The wrapper (button + tooltip) has no layout below 60em, where the toggle
+   isn't offered — without this, the tooltip text renders as unstyled,
+   always-visible text in the mobile page flow. */
+.ds-toc-toggle-wrapper {
+    display: none;
+}
+
 /* ToC collapse toggle: available wherever Material renders the secondary
    sidebar (>= 60em), not just on the wide desktop layout (>= 76.25em). */
 @media screen and (min-width: 60em) {
+    .ds-toc-toggle-wrapper {
+        display: block;
+    }
+
     .md-sidebar--secondary {
         transition:
             width var(--ds-motion-duration) ease,
