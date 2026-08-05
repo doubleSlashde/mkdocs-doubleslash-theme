@@ -7,6 +7,7 @@
     var TOOLTIP_DURATION_MS = 3000;
     var LABEL_COLLAPSE = "Inhaltsverzeichnis ausblenden";
     var LABEL_EXPAND = "Inhaltsverzeichnis einblenden";
+    var TOOLTIP_PREFIX = "Hier können Sie das ";
   
     function isTocCollapsed() {
       return document.documentElement.hasAttribute("data-ds-toc-collapsed");
@@ -46,15 +47,20 @@
       return !secondary.querySelector(".md-nav--secondary .md-nav__item");
     }
   
-    function updateButtonState(button) {
+    function updateButtonState(button, tooltip) {
       var collapsed = isTocCollapsed();
       var collapseIcon = button.querySelector(".ds-toc-toggle__icon--collapse");
       var expandIcon = button.querySelector(".ds-toc-toggle__icon--expand");
-  
+      var label = collapsed ? LABEL_EXPAND : LABEL_COLLAPSE;
+
       button.setAttribute("aria-pressed", collapsed ? "true" : "false");
-      button.setAttribute("aria-label", collapsed ? LABEL_EXPAND : LABEL_COLLAPSE);
-      button.setAttribute("title", collapsed ? LABEL_EXPAND : LABEL_COLLAPSE);
-  
+      button.setAttribute("aria-label", label);
+      button.setAttribute("title", label);
+
+      if (tooltip) {
+        tooltip.textContent = TOOLTIP_PREFIX + label;
+      }
+
       if (collapseIcon) {
         collapseIcon.hidden = collapsed;
       }
@@ -145,7 +151,7 @@
         }
         if (isTocCollapsed()) {
           setTocCollapsed(false);
-          updateButtonState(button);
+          updateButtonState(button, tooltip);
         }
         return;
       }
@@ -200,12 +206,12 @@
         }
       } catch (e) {}
   
-      updateButtonState(button);
+      updateButtonState(button, tooltip);
       updateButtonVisibility(button, tooltip, tooltipControl);
-  
+
       button.addEventListener("click", function () {
         setTocCollapsed(!isTocCollapsed());
-        updateButtonState(button);
+        updateButtonState(button, tooltip);
         tooltipControl.clearAutoHideTimer();
         tooltipControl.hideIfUnpinned(true);
         document.dispatchEvent(new CustomEvent("ds-toc-collapse-change"));
@@ -213,7 +219,7 @@
   
       desktopMedia.addEventListener("change", function () {
         updateButtonVisibility(button, tooltip, tooltipControl);
-        updateButtonState(button);
+        updateButtonState(button, tooltip);
       });
   
       window.addEventListener("resize", function () {

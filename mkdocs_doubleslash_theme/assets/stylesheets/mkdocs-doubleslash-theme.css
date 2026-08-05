@@ -30,6 +30,7 @@
     --ds-spacing-xxl: 24px;
     --ds-motion-duration: 0.3s;
     --ds-motion-transition: var(--ds-motion-duration) ease all;
+    --ds-wide-max-width: min(1800px, 100% - 4rem);
 
     /* Typography tokens — source: frontend/DESIGN.md (living-styleguide, ref=main) */
     --ds-typography-body-website-font-size: 18px;
@@ -157,6 +158,14 @@
         border-radius: 0 0 var(--ds-rounded-md) var(--ds-rounded-md);
     }
 
+    /* Material hardcodes this background to --md-primary-fg-color--dark, a
+       variable this theme never sets, so it fell back to Material's default
+       indigo. Fixed color in both schemes to match the dark badge look. */
+    .md-nav__source {
+        background-color: var(--ds-color-dark-hover);
+        color: var(--ds-color-dark-clickable);
+    }
+
     .md-tabs__item {
         color: var(--md-typeset-color);
         opacity: 1;
@@ -216,19 +225,25 @@
         align-items: stretch;
     }
 
-    .md-content {
-        border-left: solid;
-        border-width: 1px;
-        border-color: var(--ds-color-border);
-        transition: border-color var(--ds-motion-duration) ease;
+    /* The sidebar this divider separates from is off-canvas (drawer) below
+       76.25em, so the border has nothing to divide until that breakpoint. */
+    @media screen and (min-width: 76.25em) {
+        .md-content {
+            border-left: solid;
+            border-width: 1px;
+            border-color: var(--ds-color-border);
+            transition: border-color var(--ds-motion-duration) ease;
+        }
     }
 
     /* Fixed reading measure: as the sidebars collapse/expand, .md-content__inner
        is a flex item that keeps resizing, so the prose keeps re-wrapping for the
        whole animation. Capping it stops the reflow and is a readability win on
-       wide screens either way — .md-grid stays wide for tables/diagrams. */
+       wide screens either way — .md-grid stays wide for tables/diagrams. Left
+       at Material's own small gutter by default, so text still hugs the
+       sidebar divider instead of floating centered in the available space. */
     .md-content__inner {
-        max-width: 80ch;
+        max-width: 90ch;
     }
 
     .md-content .md-typeset h1,
@@ -397,8 +412,24 @@
     width: 1rem;
 }
 
-.md-grid {
-    max-width: min(1800px, 100% - 4rem);
+/* Only constrain width on wide desktop layouts (>= 76.25em) — unguarded,
+   the "100% - 4rem" term shrinks these below their natural width on ANY
+   viewport, adding unwanted side margins on mobile too. Content only picks
+   up the same width as .md-grid once a sidebar is actually collapsed, so it
+   stays aligned with the header instead of fighting the 90ch reading cap. */
+@media screen and (min-width: 76.25em) {
+    .md-grid {
+        max-width: var(--ds-wide-max-width);
+    }
+
+    /* Once a sidebar is actually collapsed, drop the 90ch reading cap so text
+       fills the reclaimed space instead of leaving it padded out on one
+       side — that's the whole point of the widen toggle. Material's own
+       small per-sidebar gutter (margin-left/right: 1.2rem) still applies. */
+    html[data-ds-content-wide] .md-content__inner,
+    html[data-ds-toc-collapsed] .md-content__inner {
+        max-width: none;
+    }
 }
 
 /* The wrapper (button + tooltip) has no layout below 60em, where the toggle
@@ -439,10 +470,6 @@
             min-width var(--ds-motion-duration) ease,
             opacity var(--ds-motion-duration) ease,
             visibility 0s linear var(--ds-motion-duration);
-    }
-
-    html[data-ds-toc-collapsed] .md-main__inner {
-        margin-right: 80px;
     }
 
     .ds-toc-toggle-wrapper {
@@ -592,10 +619,6 @@
             min-width var(--ds-motion-duration) ease,
             opacity var(--ds-motion-duration) ease,
             visibility 0s linear var(--ds-motion-duration);
-    }
-
-    html[data-ds-content-wide] .md-main__inner {
-        margin-left: 0;
     }
 
     html[data-ds-content-wide] .md-content {
