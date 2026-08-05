@@ -772,7 +772,15 @@
         background-color: var(--md-default-bg-color);
         color: var(--md-default-fg-color);
         cursor: pointer;
-        transition: var(--ds-motion-transition);
+        /* Not `--ds-motion-transition` (transitions `all`): JS repositions this
+           button via `left` on every ResizeObserver tick to track the sidebar
+           collapse. Transitioning `left` too would restart a 300ms interpolation
+           on each tick — invisible in Chrome (fires ~every frame) but visible as
+           lag behind the sidebar in Firefox/Safari (fewer, batched ticks). */
+        transition:
+            color var(--ds-motion-duration) ease,
+            background-color var(--ds-motion-duration) ease,
+            border-color var(--ds-motion-duration) ease;
     }
 
     .ds-content-width-toggle:hover {
