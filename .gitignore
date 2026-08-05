@@ -17,3 +17,7 @@ wheels/
 node_modules/
 
 .DS_Store
+
+# mkdocs-document-dates cache
+docs/.dates_cache.jsonl
+docs/.gitattributes
