@@ -1,3 +1,32 @@
+## v1.3.0 (2026-08-06)
+
+### Features
+
+- add collapsable sidebars
+
+### Bug Fixes
+
+- don't auto-show ToC toggle tooltip on page load (#54)
+- ToC toggle overlap and sticky title bleed-through (#53)
+- align widened content with header grid, sync ToC tooltip state (#52)
+- sidebar and theme picker bugs (UCD-180) (#51)
+
+### Build
+
+- **deps-dev**: bump commitizen from 4.16.4 to 4.17.0
+- **deps**: bump pymdown-extensions in the uv group across 1 directory
+- **deps-dev**: bump ruff from 0.15.22 to 0.16.0
+- **deps**: bump mkdocs-material from 9.7.6 to 9.7.7
+- **deps-dev**: bump ruff from 0.15.21 to 0.15.22
+- **deps-dev**: bump ruff from 0.15.20 to 0.15.21
+- **deps-dev**: bump ruff from 0.15.18 to 0.15.20
+- **deps-dev**: bump ruff from 0.15.17 to 0.15.18
+- **deps-dev**: bump commitizen from 4.16.3 to 4.16.4
+- **deps-dev**: bump ruff from 0.15.16 to 0.15.17
+- **deps-dev**: bump ruff from 0.15.15 to 0.15.16
+- **deps-dev**: bump commitizen from 4.16.2 to 4.16.3
+- **deps-dev**: bump ruff from 0.15.14 to 0.15.15
+
 ## v1.2.1 (2026-05-27)
 
 ### Bug Fixes
