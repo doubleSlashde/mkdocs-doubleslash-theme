@@ -2,7 +2,6 @@
     "use strict";
   
     var STORAGE_KEY = "ds-toc-collapsed";
-    var TOOLTIP_STORAGE_KEY = "ds-toc-toggle-tooltip-shown";
     var DESKTOP_QUERY = "(min-width: 76.25em)";
     var TOOLTIP_DURATION_MS = 3000;
     var LABEL_COLLAPSE = "Inhaltsverzeichnis ausblenden";
@@ -193,43 +192,9 @@
           setTocCollapsed(false);
           updateButtonState(button, tooltip);
         }
-        return;
       }
-  
-      maybeShowInitialTooltip(button, tooltip, tooltipControl);
     }
-  
-    function maybeShowInitialTooltip(button, tooltip, tooltipControl) {
-      if (!tooltip || button.hidden) {
-        return;
-      }
-  
-      try {
-        if (sessionStorage.getItem(TOOLTIP_STORAGE_KEY) === "true") {
-          return;
-        }
-      } catch (e) {
-        return;
-      }
-  
-      showInitialTooltip(tooltip, tooltipControl);
-    }
-  
-    function showInitialTooltip(tooltip, tooltipControl) {
-      if (!tooltip || tooltip.classList.contains("ds-toc-toggle__tooltip--visible")) {
-        return;
-      }
-  
-      try {
-        sessionStorage.setItem(TOOLTIP_STORAGE_KEY, "true");
-      } catch (e) {}
-  
-      window.requestAnimationFrame(function () {
-        showTooltip(tooltip);
-        tooltipControl.scheduleAutoHide();
-      });
-    }
-  
+
     function init() {
       var button = document.querySelector("[data-md-component='toc-collapse-toggle']");
       var tooltip = document.querySelector("[data-md-component='toc-collapse-tooltip']");
