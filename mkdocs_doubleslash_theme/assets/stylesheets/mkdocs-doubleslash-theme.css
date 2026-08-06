@@ -31,6 +31,12 @@
     --ds-motion-duration: 0.3s;
     --ds-motion-transition: var(--ds-motion-duration) ease all;
     --ds-wide-max-width: min(1800px, 100% - 4rem);
+    /* Separate from --ds-wide-max-width (used for the actual reading column
+       fill-width): this is only for .md-main__inner/.md-grid's own margin,
+       where 8rem (4rem per side) leaves enough room for the sidebar-collapse
+       toggle buttons (43px + 20px gap ≈ 63px each) to sit outside it without
+       drifting off-screen at narrower viewports. */
+    --ds-grid-max-width: min(1800px, 100% - 8rem);
 
     /* Typography tokens — source: frontend/DESIGN.md (living-styleguide, ref=main) */
     --ds-typography-body-website-font-size: 18px;
@@ -61,6 +67,14 @@
     --ds-typography-heading-h6-font-size: 18px;
     --ds-typography-heading-h6-line-height: 24px;
     --ds-typography-heading-h6-margin-bottom: 12px;
+}
+
+/* Material scales the root font-size in three hard jumps (125% / 137.5% /
+   150% at 100em / 125em) — every rem-based size and spacing on the page
+   snaps at those breakpoints. clamp() scales it continuously instead: 20px
+   up to ~1600px, 24px from ~2560px, linear in between. */
+html {
+    font-size: clamp(20px, 16px + 0.3125vw, 24px);
 }
 
 [data-md-color-scheme="default"] {
@@ -244,6 +258,15 @@
        sidebar divider instead of floating centered in the available space. */
     .md-content__inner {
         max-width: 90ch;
+        /* Capped at the column's own available width too: .md-content__inner
+           isn't itself a flex item — it's a plain block inside the
+           .md-content column that the sidebars already shrank — so an
+           unqualified 70ch floor ignores that shrunk width and overflows
+           into the ToC/nav sidebar whenever both are open on a narrower
+           viewport. min() keeps the floor from exceeding it; the 2.4rem
+           subtracted is this element's own left+right margin (1.2rem each),
+           which sits outside the border-box that min-width sizes. */
+        min-width: min(70ch, calc(100% - 2.4rem));
         transition: max-width var(--ds-motion-duration) ease;
     }
 
@@ -413,16 +436,22 @@
     width: 1rem;
 }
 
+/* The ToC toggle is offered starting at 60em (below), narrower than the
+   76.25em block below — without room here too, it has nowhere to sit but
+   on top of the ToC sidebar, which is flush against the viewport edge at
+   these widths. */
+@media screen and (min-width: 60em) {
+    .md-grid {
+        max-width: var(--ds-grid-max-width);
+    }
+}
+
 /* Only constrain width on wide desktop layouts (>= 76.25em) — unguarded,
    the "100% - 4rem" term shrinks these below their natural width on ANY
    viewport, adding unwanted side margins on mobile too. Content only picks
    up the same width as .md-grid once a sidebar is actually collapsed, so it
    stays aligned with the header instead of fighting the 90ch reading cap. */
 @media screen and (min-width: 76.25em) {
-    .md-grid {
-        max-width: var(--ds-wide-max-width);
-    }
-
     /* Once a sidebar is actually collapsed, drop the 90ch reading cap so text
        fills the reclaimed space instead of leaving it padded out on one
        side — that's the whole point of the widen toggle. Material's own
@@ -733,8 +762,9 @@
     }
 }
 
-/* Remove the opaque background/box-shadow Material adds to the sticky ToC title */
+/* Remove Material's box-shadow on the sticky ToC title, but keep an opaque
+   background — otherwise scrolled-past headings show through behind it. */
 .md-nav--secondary .md-nav__title {
-    background-color: transparent;
+    background-color: var(--md-default-bg-color);
     box-shadow: none;
 }

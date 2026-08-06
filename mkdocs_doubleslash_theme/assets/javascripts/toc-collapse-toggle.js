@@ -158,12 +158,18 @@
       }
 
       var width = wrapper.getBoundingClientRect().width;
-      // Extra 20px breathing room from the grid edge, but only when parked
-      // there in the collapsed state — flush against the ToC divider
-      // otherwise. Never closer than 20px to the real viewport edge either,
-      // or the wrapper ends up pinned to it on viewports with little margin.
-      var gap = collapsed ? 20 : 0;
-      var right = Math.max(20, window.innerWidth - anchor.getBoundingClientRect().right - width - gap);
+      // Extra 20px breathing room from the grid edge when parked there in
+      // the collapsed state; a smaller 8px gap otherwise so the button
+      // doesn't sit flush against the sidebar's scrollbar. Never closer
+      // than 20px to the real viewport edge either, or the wrapper ends up
+      // pinned to it on viewports with little margin.
+      var gap = collapsed ? 20 : 18;
+      // position:fixed's `right` is relative to the document's clientWidth
+      // (viewport minus scrollbar), not window.innerWidth (which includes
+      // it) — using innerWidth here pushed the button left by the
+      // scrollbar's own width, into the sidebar.
+      var viewportWidth = document.documentElement.clientWidth;
+      var right = Math.max(20, viewportWidth - anchor.getBoundingClientRect().right - width - gap);
       wrapper.style.right = right + "px";
     }
 
