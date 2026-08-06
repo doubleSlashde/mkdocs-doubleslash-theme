@@ -30,6 +30,7 @@
     --ds-spacing-xxl: 24px;
     --ds-motion-duration: 0.3s;
     --ds-motion-transition: var(--ds-motion-duration) ease all;
+    --ds-wide-max-width: min(1800px, 100% - 4rem);
 
     /* Typography tokens — source: frontend/DESIGN.md (living-styleguide, ref=main) */
     --ds-typography-body-website-font-size: 18px;
@@ -157,6 +158,14 @@
         border-radius: 0 0 var(--ds-rounded-md) var(--ds-rounded-md);
     }
 
+    /* Material hardcodes this background to --md-primary-fg-color--dark, a
+       variable this theme never sets, so it fell back to Material's default
+       indigo. Fixed color in both schemes to match the dark badge look. */
+    .md-nav__source {
+        background-color: var(--ds-color-dark-hover);
+        color: var(--ds-color-dark-clickable);
+    }
+
     .md-tabs__item {
         color: var(--md-typeset-color);
         opacity: 1;
@@ -216,19 +225,26 @@
         align-items: stretch;
     }
 
-    .md-content {
-        border-left: solid;
-        border-width: 1px;
-        border-color: var(--ds-color-border);
-        transition: border-color var(--ds-motion-duration) ease;
+    /* The sidebar this divider separates from is off-canvas (drawer) below
+       76.25em, so the border has nothing to divide until that breakpoint. */
+    @media screen and (min-width: 76.25em) {
+        .md-content {
+            border-left: solid;
+            border-width: 1px;
+            border-color: var(--ds-color-border);
+            transition: border-color var(--ds-motion-duration) ease;
+        }
     }
 
     /* Fixed reading measure: as the sidebars collapse/expand, .md-content__inner
        is a flex item that keeps resizing, so the prose keeps re-wrapping for the
        whole animation. Capping it stops the reflow and is a readability win on
-       wide screens either way — .md-grid stays wide for tables/diagrams. */
+       wide screens either way — .md-grid stays wide for tables/diagrams. Left
+       at Material's own small gutter by default, so text still hugs the
+       sidebar divider instead of floating centered in the available space. */
     .md-content__inner {
-        max-width: 80ch;
+        max-width: 90ch;
+        transition: max-width var(--ds-motion-duration) ease;
     }
 
     .md-content .md-typeset h1,
@@ -397,8 +413,33 @@
     width: 1rem;
 }
 
-.md-grid {
-    max-width: min(1800px, 100% - 4rem);
+/* Only constrain width on wide desktop layouts (>= 76.25em) — unguarded,
+   the "100% - 4rem" term shrinks these below their natural width on ANY
+   viewport, adding unwanted side margins on mobile too. Content only picks
+   up the same width as .md-grid once a sidebar is actually collapsed, so it
+   stays aligned with the header instead of fighting the 90ch reading cap. */
+@media screen and (min-width: 76.25em) {
+    .md-grid {
+        max-width: var(--ds-wide-max-width);
+    }
+
+    /* Once a sidebar is actually collapsed, drop the 90ch reading cap so text
+       fills the reclaimed space instead of leaving it padded out on one
+       side — that's the whole point of the widen toggle. Material's own
+       small per-sidebar gutter (margin-left/right: 1.2rem) still applies.
+       Reuses the same cap as .md-grid (a concrete value, not `none`) so the
+       max-width transition can interpolate smoothly instead of jumping. */
+    html[data-ds-content-wide] .md-content__inner,
+    html[data-ds-toc-collapsed] .md-content__inner {
+        max-width: var(--ds-wide-max-width);
+    }
+
+    /* The ToC sidebar already bounds the layout on the right, so text can
+       fill toward it without feeling unbounded — only cap the reading
+       measure when there's no ToC there to fill toward. */
+    [dir="ltr"] .md-sidebar--secondary:not([hidden]) ~ .md-content > .md-content__inner {
+        max-width: var(--ds-wide-max-width);
+    }
 }
 
 /* The wrapper (button + tooltip) has no layout below 60em, where the toggle
@@ -441,10 +482,6 @@
             visibility 0s linear var(--ds-motion-duration);
     }
 
-    html[data-ds-toc-collapsed] .md-main__inner {
-        margin-right: 80px;
-    }
-
     .ds-toc-toggle-wrapper {
         position: fixed;
         top: 6rem;
@@ -460,7 +497,7 @@
         height: var(--ds-spacing-control-height);
         padding: 0;
         margin: 5px 0 0 0;
-        border: inset 0 0 0 2px var(--ds-color-primary);
+        border: 2px solid var(--ds-color-border);
         border-radius: 50px;
         background-color: var(--md-default-bg-color);
         color: var(--md-default-fg-color);
@@ -468,8 +505,12 @@
         transition: var(--ds-motion-transition);
     }
 
-    [data-md-color-scheme="slate"] .ds-toc-toggle {
-        border-color: var(--ds-color-dark-clickable);
+    /* var(--md-accent-fg-color): already scheme-aware (aliases to the light
+       or dark accent per [data-md-color-scheme]), unlike a separate slate
+       override here — Material puts that attribute on <body>, not <html>,
+       so a selector combining it with html[data-ds-toc-collapsed] never matches. */
+    html[data-ds-toc-collapsed] .ds-toc-toggle {
+        border: 2px solid var(--md-accent-fg-color);
     }
 
     .ds-toc-toggle:hover {
@@ -563,10 +604,6 @@
 }
 
 @media screen and (min-width: 76.25em) {
-    .md-content {
-        padding-left: 40px;
-    }
-
     .md-sidebar--primary,
     .md-sidebar--secondary {
         transition:
@@ -574,6 +611,23 @@
             min-width var(--ds-motion-duration) ease,
             opacity var(--ds-motion-duration) ease,
             visibility 0s linear 0s;
+    }
+
+    /* Fixed width so the nav text doesn't reflow as the sidebar's own width
+       animates to/from 0 — the outer sidebar just clips it via overflow,
+       instead of the text re-wrapping line by line during the transition.
+       .md-sidebar__scrollwrap has its own 0.2rem margin on each side, so
+       matching the sidebar's own 12.1rem here overflowed it horizontally. */
+    .md-sidebar__inner {
+        width: calc(12.1rem - 0.4rem);
+    }
+
+    /* Material only sets overflow-y on the scrollwrap, which per spec forces
+       overflow-x to auto too — while the sidebar's width is mid-transition,
+       the fixed-width inner above briefly overflows it, flashing a
+       horizontal scrollbar. We never want horizontal scroll here anyway. */
+    .md-sidebar__scrollwrap {
+        overflow-x: hidden;
     }
 
     .md-main__inner {
@@ -594,10 +648,6 @@
             visibility 0s linear var(--ds-motion-duration);
     }
 
-    html[data-ds-content-wide] .md-main__inner {
-        margin-left: 0;
-    }
-
     html[data-ds-content-wide] .md-content {
         border-left-color: transparent;
     }
@@ -607,7 +657,6 @@
         position: fixed;
         top: 50%;
         margin-top: calc(var(--ds-toggle-size) / -2);
-        margin-left: calc(var(--ds-toggle-size) / -2);
         display: flex;
         align-items: center;
         justify-content: center;
@@ -662,15 +711,14 @@
         display: none;
     }
 
+    /* var(--md-accent-fg-color): already scheme-aware (aliases to the light
+       or dark accent per [data-md-color-scheme]), unlike a separate slate
+       override here — Material puts that attribute on <body>, not <html>,
+       so a selector combining it with html[data-ds-content-wide] never matches. */
     html[data-ds-content-wide] .ds-content-width-toggle {
-        left: var(--ds-spacing-xl);
         margin-left: 0;
-        border: inset 0 0 0 2px var(--ds-color-primary);
+        border: 2px solid var(--md-accent-fg-color);
         border-radius: 50px;
-    }
-
-    [data-md-color-scheme="slate"] html[data-ds-content-wide] .ds-content-width-toggle {
-        border-color: var(--ds-color-dark-clickable);
     }
 
     @media (prefers-reduced-motion: reduce) {

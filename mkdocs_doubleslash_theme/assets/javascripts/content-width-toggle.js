@@ -62,19 +62,31 @@
     }
   
     function updateButtonPosition(button) {
-      if (isWideMode() || button.hidden) {
+      if (button.hidden) {
         button.style.removeProperty("left");
         return;
       }
-  
-      var content = document.querySelector(".md-content");
-      if (!content) {
+
+      // Sit just outside the relevant left boundary — the primary sidebar
+      // while it's still showing (straddling the divider used to overlap
+      // the nav's own links on short pages), or .md-main__inner (aligned
+      // with the header grid) once the sidebar is collapsed. Never inside
+      // either box, so it never covers real content.
+      var wide = isWideMode();
+      var anchor = document.querySelector(wide ? ".md-main__inner" : ".md-sidebar--primary");
+      if (!anchor) {
         button.style.removeProperty("left");
         return;
       }
-  
-      // Align with .md-content border-left (the divider belongs to content, not the sidebar).
-      button.style.left = content.getBoundingClientRect().left + "px";
+
+      var width = button.getBoundingClientRect().width;
+      // Extra 20px breathing room from the grid edge, but only when parked
+      // there in wide mode — flush against the sidebar divider otherwise.
+      // Never closer than 20px to the real viewport edge either, or the
+      // button ends up pinned to it on viewports with little/no margin.
+      var gap = wide ? 20 : 0;
+      var left = Math.max(20, anchor.getBoundingClientRect().left - width - gap);
+      button.style.left = left + "px";
     }
   
     function scheduleButtonPositionUpdate(button) {
