@@ -116,7 +116,15 @@
       }
   
       refreshButton(button, desktopMedia);
-  
+
+      // Everything above re-runs per navigation; everything below wires
+      // listeners and must not. Material's instant navigation keeps this node
+      // alive, so a second pass would double-bind the click handler.
+      if (button.dataset.dsWired) {
+        return;
+      }
+      button.dataset.dsWired = "1";
+
       button.addEventListener("click", function () {
         setWideMode(!isWideMode());
         refreshButton(button, desktopMedia);
@@ -160,7 +168,11 @@
       }
     }
   
-    if (document.readyState === "loading") {
+    // With navigation.instant, DOMContentLoaded fires once for the whole
+    // session. Material republishes document$ on every navigation.
+    if (window.document$ && typeof window.document$.subscribe === "function") {
+      window.document$.subscribe(init);
+    } else if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", init);
     } else {
       init();

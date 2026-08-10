@@ -7,6 +7,11 @@
     var LABEL_COLLAPSE = "Inhaltsverzeichnis ausblenden";
     var LABEL_EXPAND = "Inhaltsverzeichnis einblenden";
     var TOOLTIP_PREFIX = "Hier können Sie das ";
+    var TOP_GAP = 12;
+
+    // bindTooltipInteractions() attaches listeners, so it must run exactly
+    // once even though init() re-runs on every instant navigation.
+    var tooltipControlCache = null;
   
     function isTocCollapsed() {
       return document.documentElement.hasAttribute("data-ds-toc-collapsed");
@@ -54,10 +59,16 @@
 
       button.setAttribute("aria-pressed", collapsed ? "true" : "false");
       button.setAttribute("aria-label", label);
-      button.setAttribute("title", label);
 
       if (tooltip) {
+        // The button carries its own tooltip element. A `title` on top of it
+        // makes the browser render its native tooltip alongside, so the label
+        // shows up twice. aria-label plus aria-describedby keep assistive
+        // technology covered without it.
+        button.removeAttribute("title");
         tooltip.textContent = TOOLTIP_PREFIX + label;
+      } else {
+        button.setAttribute("title", label);
       }
 
       if (collapseIcon) {
@@ -138,10 +149,36 @@
       };
     }
   
+    function updateWrapperTop(wrapper) {
+      // The CSS parks the wrapper at a fixed `top: 6rem`, which only clears a
+      // single-row header. With navigation.tabs.sticky there is a second row
+      // and the icon lands on top of it. Derive the offset from whatever
+      // chrome is actually rendered instead. Read at the current scroll
+      // position only — sticky tabs slide away while scrolling, and following
+      // them would make the button jitter, so it stays parked below their
+      // full height.
+      var chrome = [
+        document.querySelector(".md-header"),
+        document.querySelector(".md-tabs"),
+      ];
+      var bottom = 0;
+      for (var i = 0; i < chrome.length; i++) {
+        var el = chrome[i];
+        if (el && el.offsetParent !== null) {
+          bottom = Math.max(bottom, el.getBoundingClientRect().bottom);
+        }
+      }
+      if (bottom > 0) {
+        wrapper.style.top = Math.round(bottom + TOP_GAP) + "px";
+      }
+    }
+
     function updateWrapperPosition(wrapper) {
       if (!wrapper) {
         return;
       }
+
+      updateWrapperTop(wrapper);
 
       // Sit just outside the relevant right boundary — the secondary
       // sidebar while it's still showing (touching the ToC's own right
@@ -203,7 +240,10 @@
         return;
       }
 
-      var tooltipControl = bindTooltipInteractions(button, tooltip);
+      if (!tooltipControlCache) {
+        tooltipControlCache = bindTooltipInteractions(button, tooltip);
+      }
+      var tooltipControl = tooltipControlCache;
       var desktopMedia = window.matchMedia(DESKTOP_QUERY);
 
       try {
@@ -215,6 +255,15 @@
       updateButtonState(button, tooltip);
       updateButtonVisibility(button, tooltip, tooltipControl);
       updateWrapperPosition(wrapper);
+
+      // Everything above re-runs per navigation; everything below wires
+      // listeners and must not. Material's instant navigation keeps these
+      // nodes alive, so a second pass would double-bind the click handler
+      // and every click would toggle twice.
+      if (button.dataset.dsWired) {
+        return;
+      }
+      button.dataset.dsWired = "1";
 
       button.addEventListener("click", function () {
         setTocCollapsed(!isTocCollapsed());
@@ -255,7 +304,12 @@
       }
     }
   
-    if (document.readyState === "loading") {
+    // With navigation.instant, DOMContentLoaded fires once for the whole
+    // session, so the button keeps whatever state the previous page left it
+    // in. Material republishes document$ on every navigation.
+    if (window.document$ && typeof window.document$.subscribe === "function") {
+      window.document$.subscribe(init);
+    } else if (document.readyState === "loading") {
       document.addEventListener("DOMContentLoaded", init);
     } else {
       init();

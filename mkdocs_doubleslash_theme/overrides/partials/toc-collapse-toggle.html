@@ -14,7 +14,9 @@
         aria-pressed="false"
         aria-label="Inhaltsverzeichnis ausblenden"
         aria-describedby="ds-toc-toggle-tooltip"
-        title="Inhaltsverzeichnis ausblenden"
+        {#- No `title` here: the tooltip element above already carries the
+            label, and a title would make the browser draw its own tooltip
+            next to it. -#}
         hidden
     >
       <span class="ds-toc-toggle__icon ds-toc-toggle__icon--collapse" aria-hidden="true">
