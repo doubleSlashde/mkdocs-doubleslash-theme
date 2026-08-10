@@ -1,3 +1,10 @@
+## v1.3.1 (2026-08-10)
+
+### Bug Fixes
+
+- adapt the website type and table scale to docs content
+- make the toggles survive sticky tabs and instant navigation
+
 ## v1.3.0 (2026-08-06)
 
 ### Features
