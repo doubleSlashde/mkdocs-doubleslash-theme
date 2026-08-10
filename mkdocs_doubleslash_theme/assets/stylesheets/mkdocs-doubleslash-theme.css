@@ -52,8 +52,12 @@
     --ds-typography-heading-h1-website-font-size: 45px;
     --ds-typography-heading-h1-website-line-height: 58.5px;
     --ds-typography-heading-h1-website-margin-bottom: 30px;
-    --ds-typography-heading-h2-website-font-size: 40px;
-    --ds-typography-heading-h2-website-line-height: 52px;
+    /* PLACEHOLDER — final value to be set by design. The website scale puts
+       H2 at 40px, which competes with H1 (45px) on a docs page carrying many
+       H2 per article. 28px keeps a gap in both directions, to H1 above and
+       to H3 (25px) below. */
+    --ds-typography-heading-h2-website-font-size: 28px;
+    --ds-typography-heading-h2-website-line-height: 36px;
     --ds-typography-heading-h2-website-margin-bottom: 15px;
     --ds-typography-heading-h3-website-font-size: 25px;
     --ds-typography-heading-h3-website-line-height: 40px;
@@ -270,6 +274,20 @@ html {
         transition: max-width var(--ds-motion-duration) ease;
     }
 
+    /* A page that hides the navigation (hide: navigation, typically together
+       with toc) has no sidebar left to hug, so the reading measure above just
+       parks the prose in the left third and leaves the rest of the grid
+       empty: measured 990px of text in a 1744px grid, where 1.2.x filled
+       1765px. There is also no way out of it, because the content-width
+       toggle only shows itself while a sidebar can collapse. Give those pages
+       the grid back.
+       DESIGN CALL, please review: the alternative is to keep the cap and
+       surface the width toggle on these pages instead. That preserves the
+       reading measure but costs the reader a click. */
+    .md-sidebar--primary[hidden] ~ .md-content .md-content__inner {
+        max-width: none;
+    }
+
     .md-content .md-typeset h1,
     .md-content .md-typeset h2,
     .md-content .md-typeset h3,
@@ -351,7 +369,13 @@ html {
         box-shadow: none;
         font-size: var(--ds-typography-body-md-font-size);
         line-height: var(--ds-typography-footer-md-line-height);
-        white-space: nowrap;
+        /* PROPOSAL — please check against the design system. The website
+           variant sets `nowrap`, which suits short marketing cells. Docs
+           tables carry whole sentences: with nowrap a six-column table grew
+           to 2784px inside 1158px of space and could only be read by
+           scrolling sideways. */
+        white-space: normal;
+        overflow-wrap: break-word;
     }
 
     .md-typeset table:not([class]) thead {
