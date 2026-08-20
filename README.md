@@ -27,7 +27,7 @@ For detailed instructions and a demo, please read the **[documentation](https://
 ### Local setup
 
 Run `./local-preview` in your terminal to build and run a MkDocs server with the plugin installed,
-serving on <http://127.0.0.1:8000/>.
+serving on <http://127.0.0.1:8010/>.
 
 ## Releasing
 

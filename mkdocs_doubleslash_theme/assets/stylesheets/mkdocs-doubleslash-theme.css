@@ -8,7 +8,7 @@
     --ds-color-surface-medium: #efefef;
     --ds-color-ink: #000000;
     --ds-color-tertiary: #6d6d6d;
-    --ds-color-border: #6d6d6d;
+    --ds-color-border: #c6c6c6;
     --ds-color-disabled-shape: #c6c6c6;
     --ds-color-shadow-elevation: #0000001a;
     --ds-color-shadow-token: #00000029;
@@ -19,6 +19,7 @@
     --ds-color-dark-container: #22303c;
     --ds-color-dark-hover: #2d3740;
     --ds-color-dark-disabled: #84999f;
+    --ds-color-dark-border: #84999f;
     --ds-rounded-xs: 4px;
     --ds-rounded-md: 10px;
     --ds-rounded-pill: 32px;
@@ -118,6 +119,10 @@ html {
     --md-accent-fg-color: var(--ds-color-dark-clickable);
     --md-accent-fg-color--transparent: color-mix(in srgb, var(--ds-color-brand-cyan) 12.5%, transparent);
     --md-accent-bg-color: var(--ds-color-canvas);
+
+    /* Scheme-aware alias: every `var(--ds-color-border)` rule picks up the
+       dark value here, so no rule needs its own slate override. */
+    --ds-color-border: var(--ds-color-dark-border);
 
     --md-typeset-a-color: var(--ds-color-dark-clickable);
     --md-custom-accent-color: var(--ds-color-dark-canvas);
@@ -389,7 +394,7 @@ html {
         content: "";
         position: absolute;
         inset: 0;
-        border: 1px solid var(--ds-color-disabled-shape);
+        border: 1px solid var(--ds-color-border);
         border-radius: var(--ds-rounded-md);
         pointer-events: none;
     }
@@ -407,7 +412,7 @@ html {
 
     .md-typeset table:not([class]) tbody tr {
         height: 50px;
-        border-bottom: 1px solid var(--ds-color-disabled-shape);
+        border-bottom: 1px solid var(--ds-color-border);
         text-align: left;
     }
 
@@ -419,17 +424,18 @@ html {
         background-color: var(--ds-color-surface-bright);
     }
 
-    [data-md-color-scheme="slate"] .md-typeset table:not([class]) tbody::before,
-    [data-md-color-scheme="slate"] .md-typeset table:not([class]) tbody::after {
-        border-color: var(--ds-color-dark-disabled);
-    }
-
-    [data-md-color-scheme="slate"] .md-typeset table:not([class]) tbody tr {
-        border-bottom-color: var(--ds-color-dark-disabled);
-    }
-
     [data-md-color-scheme="slate"] .md-typeset table:not([class]) tbody tr:hover {
         background-color: var(--ds-color-dark-hover);
+    }
+
+    .md-typeset .tabbed-set {
+        border: 1px solid var(--ds-color-border);
+        border-radius: var(--ds-rounded-md);
+    }
+
+    .md-typeset .tabbed-content {
+        padding-left: 1rem;
+        padding-right: 1rem;
     }
 
     .md-path__item:not(:first-child) {
