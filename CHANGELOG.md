@@ -1,3 +1,15 @@
+## v1.4.0 (2026-08-20)
+
+### Features
+
+- style tabbed sets and make the border token scheme-aware
+
+### Build
+
+- **deps-dev**: bump ruff from 0.16.2 to 0.16.3
+- **deps-dev**: bump ruff from 0.16.0 to 0.16.2
+- **deps**: bump pymdown-extensions in the uv group across 1 directory
+
 ## v1.3.1 (2026-08-10)
 
 ### Bug Fixes
